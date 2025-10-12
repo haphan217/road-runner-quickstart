@@ -66,10 +66,10 @@ public class AprilTagTracking extends LinearOpMode {
 
 
             if(Math.abs(tx) > 3) {
-                Front_Left_Drive.setPower(rotation);
-                Back_Left_Drive.setPower(rotation);
-                Front_Right_Drive.setPower(-rotation);
-                Back_Right_Drive.setPower(-rotation);
+                Front_Left_Drive.setPower(-rotation);
+                Back_Left_Drive.setPower(-rotation);
+                Front_Right_Drive.setPower(rotation);
+                Back_Right_Drive.setPower(rotation);
             } else {
                 Front_Left_Drive.setPower(0);
                 Back_Left_Drive.setPower(0);
