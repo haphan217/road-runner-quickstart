@@ -88,11 +88,11 @@ public class aprilTagTest extends LinearOpMode {
                     telemetry.addData("x", x);
                     telemetry.addData("y", y);
                     telemetry.addData("id", id);
-                    Pose2d beginPose = new Pose2d(x, y, Math.toRadians(180));
-                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
-                    road = drive.actionBuilder(beginPose)
-                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(x, y)));
-                    Actions.runBlocking(road.build());
+//                    Pose2d beginPose = new Pose2d(x, y, Math.toRadians(180));
+//                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+//                    road = drive.actionBuilder(beginPose)
+//                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(x, y)));
+//                    Actions.runBlocking(road.build());
                 } else {
                     telemetry.addLine("No AprilTags detected.");
                 }
