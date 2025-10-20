@@ -71,7 +71,7 @@ public class aprilTagTest extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-            if(finished == true) {
+//            if(finished == true) {
                 LLResult result = limelight.getLatestResult();
 
                 if (result != null && result.isValid()) {
@@ -99,6 +99,6 @@ public class aprilTagTest extends LinearOpMode {
 
                 telemetry.update();
             }
-        }
+//        }
     }
 }
