@@ -29,12 +29,12 @@ import java.util.List;
 public class apriltagTestNormalCam extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;
     private double tagSize = 0.1524;
-    private Vector3d positionId21 = new Vector3d(0, 150, 15);
-    private Vector3d positionId22 = new Vector3d(36, 36, 100);
-    private Vector3d positionId23 = new Vector3d(-36, 36, 100);
-    private double degressOfpositionId21 = 0;
-    private double degressOfpositionId22 = 45;
-    private double degressOfpositionId23 = -45;
+    private Vector3d positionIdObelisk = new Vector3d(0, 150, 15);
+    private Vector3d positionIdRed = new Vector3d(36, 36, 100);
+    private Vector3d positionIdBlue = new Vector3d(-36, 36, 100);
+    private double degressOfpositionIdObelisk = 0;
+    private double degressOfpositionIdRed = 45;
+    private double degressOfpositionIdBlue = -45;
     private Vector3d positionRobot = new Vector3d(0, 0, 0);
     private final Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
@@ -107,14 +107,14 @@ public class apriltagTestNormalCam extends LinearOpMode {
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
 
-                if(detection.id == 21){
-                    double x = positionId21.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionId21));
-                    double y = positionId21.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionId21));
+                if(detection.id == 21 || detection.id == 22 || detection.id == 23){
+                    double x = positionIdObelisk.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdObelisk));
+                    double y = positionIdObelisk.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdObelisk));
                     positionRobot.set(new Vector3d(x, y, 0));
                     telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
                 } else if(detection.id == 22){
-                    double x = positionId22.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionId22));
-                    double y = positionId22.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionId22));
+                    double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
+                    double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
                     double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
                     double degressShot = Math.asin(y/distanceShot);
                     double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
@@ -122,8 +122,8 @@ public class apriltagTestNormalCam extends LinearOpMode {
                     telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
                     telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
                 } else if(detection.id == 23){
-                    double x = positionId23.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionId23));
-                    double y = positionId23.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionId23));
+                    double x = positionIdBlue.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdBlue));
+                    double y = positionIdBlue.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdBlue));
                     double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
                     double degressShot = Math.asin(y/distanceShot);
                     double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
@@ -139,6 +139,5 @@ public class apriltagTestNormalCam extends LinearOpMode {
 
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
-
     }
 }
