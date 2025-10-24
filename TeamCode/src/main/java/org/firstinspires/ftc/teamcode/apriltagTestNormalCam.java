@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
@@ -40,6 +41,8 @@ public class apriltagTestNormalCam extends LinearOpMode {
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
+    private FtcDashboard dashboard = FtcDashboard.getInstance();
+    private Telemetry dashboardTelemetry = dashboard.getTelemetry();
 
     @Override
     public void runOpMode() {
@@ -53,11 +56,68 @@ public class apriltagTestNormalCam extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
+            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+            telemetry.addData("# AprilTags Detected", currentDetections.size());
 
-            telemetryAprilTag();
+            for (AprilTagDetection detection : currentDetections) {
+                if (detection.metadata != null) {
+                    telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
+                    telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+                    dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                    dashboardTelemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
+                    dashboardTelemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+                    double x = positionIdObelisk.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdObelisk));
+                    double y = positionIdObelisk.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdObelisk));
+                    positionRobot.set(new Vector3d(x, y, 0));
+                    telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                if(detection.id == 21 || detection.id == 22 || detection.id == 23){
+//                    double x = positionIdObelisk.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdObelisk));
+//                    double y = positionIdObelisk.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdObelisk));
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                } else if(detection.id == 22){
+//                    double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
+//                    double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
+//                    double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
+//                    double degressShot = Math.asin(y/distanceShot);
+//                    double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
+//                    telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                } else if(detection.id == 23){
+//                    double x = positionIdBlue.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdBlue));
+//                    double y = positionIdBlue.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdBlue));
+//                    double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
+//                    double degressShot = Math.asin(y/distanceShot);
+//                    double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                }
+                } else {
+                    telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                    telemetry.addLine(String.format("Center %6.0f %6.0f (pixels)", detection.center.x, detection.center.y));
+                    dashboardTelemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                    dashboardTelemetry.addLine(String.format("Center %6.0f %6.0f (pixels)", detection.center.x, detection.center.y));
+
+                }
+            }
+
+            telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+            telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+            dashboardTelemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+            dashboardTelemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
 
             // Push telemetry to the Driver Station.
             telemetry.update();
+            dashboardTelemetry.update();
 
             // Save CPU resources; can resume streaming when needed.
             if (gamepad1.dpad_down) {
@@ -78,21 +138,14 @@ public class apriltagTestNormalCam extends LinearOpMode {
                 .setDrawCubeProjection(true)
                 .setDrawTagOutline(true)
                 .setTagFamily(AprilTagProcessor.TagFamily.TAG_36h11)
-                .setTagLibrary(AprilTagGameDatabase.getCenterStageTagLibrary())
+                .setTagLibrary(AprilTagGameDatabase.getDecodeTagLibrary())
                 .setOutputUnits(DistanceUnit.INCH, AngleUnit.DEGREES)
                 .setCameraPose(cameraPosition, cameraOrientation)
                 .build();
-        VisionPortal.Builder builder = new VisionPortal.Builder();
-
-        // Set the camera (webcam vs. built-in RC phone camera).
-        if (USE_WEBCAM) {
-            builder.setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"));
-        } else {
-            builder.setCamera(BuiltinCameraDirection.BACK);
-        }
-        builder.addProcessor(aprilTag);
-
-        visionPortal = builder.build();
+        VisionPortal visionPortal = new VisionPortal.Builder()
+                .setCamera(hardwareMap.get(WebcamName.class, "Webcam 1"))
+                .addProcessor(aprilTag)
+                .build();
         FtcDashboard.getInstance().startCameraStream(visionPortal, 0);
     }
     @SuppressLint("DefaultLocale")
@@ -106,12 +159,20 @@ public class apriltagTestNormalCam extends LinearOpMode {
                 telemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
-
+                dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                dashboardTelemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
+                dashboardTelemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
+//                double x = positionIdObelisk.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdObelisk));
+//                double y = positionIdObelisk.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdObelisk));
+//                positionRobot.set(new Vector3d(x, y, 0));
+//                telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
                 if(detection.id == 21 || detection.id == 22 || detection.id == 23){
                     double x = positionIdObelisk.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdObelisk));
                     double y = positionIdObelisk.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdObelisk));
                     positionRobot.set(new Vector3d(x, y, 0));
                     telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
                 } else if(detection.id == 22){
                     double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
                     double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
@@ -121,6 +182,8 @@ public class apriltagTestNormalCam extends LinearOpMode {
                     positionRobot.set(new Vector3d(x, y, 0));
                     telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
                     telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
+                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
                 } else if(detection.id == 23){
                     double x = positionIdBlue.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdBlue));
                     double y = positionIdBlue.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdBlue));
@@ -130,14 +193,20 @@ public class apriltagTestNormalCam extends LinearOpMode {
                     positionRobot.set(new Vector3d(x, y, 0));
                     telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
                     telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+                    dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
+                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
                 }
             } else {
                 telemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
                 telemetry.addLine(String.format("Center %6.0f %6.0f (pixels)", detection.center.x, detection.center.y));
+                dashboardTelemetry.addLine(String.format("\n==== (ID %d) Unknown", detection.id));
+                dashboardTelemetry.addLine(String.format("Center %6.0f %6.0f (pixels)", detection.center.x, detection.center.y));
             }
         }
 
         telemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
         telemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
+        dashboardTelemetry.addLine("\nkey:\nXYZ = X (Right), Y (Forward), Z (Up) dist.");
+        dashboardTelemetry.addLine("PRY = Pitch, Roll & Yaw (XYZ Rotation)");
     }
 }
