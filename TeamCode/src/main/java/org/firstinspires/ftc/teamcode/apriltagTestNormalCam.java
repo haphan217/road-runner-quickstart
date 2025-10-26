@@ -30,20 +30,19 @@ import java.util.List;
 public class apriltagTestNormalCam extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;
     private double tagSize = 0.1524;
-    private Vector3d positionIdObelisk = new Vector3d(0, 150, 15);
-    private Vector3d positionIdRed = new Vector3d(36, 36, 100);
-    private Vector3d positionIdBlue = new Vector3d(-36, 36, 100);
-    private double degressOfpositionIdObelisk = 0;
-    private double degressOfpositionIdRed = 45;
-    private double degressOfpositionIdBlue = -45;
-    private Vector3d positionRobot = new Vector3d(0, 0, 0);
+    private final Vector3d positionIdObelisk = new Vector3d(0, 150, 15);
+    private final Vector3d positionIdRed = new Vector3d(36, 36, 100);
+    private final Vector3d positionIdBlue = new Vector3d(-36, 36, 100);
+    private final double degressOfpositionIdObelisk = 0;
+    private final Vector3d positionRobot = new Vector3d(0, 0, 0);
     private final Position cameraPosition = new Position(DistanceUnit.INCH, 0, 0, 0, 0);
     private final YawPitchRollAngles cameraOrientation = new YawPitchRollAngles(AngleUnit.DEGREES, 0, -90, 0, 0);
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    private FtcDashboard dashboard = FtcDashboard.getInstance();
-    private Telemetry dashboardTelemetry = dashboard.getTelemetry();
+    private final FtcDashboard dashboard = FtcDashboard.getInstance();
+    private final Telemetry  dashboardTelemetry = dashboard.getTelemetry();
 
+    @SuppressLint("DefaultLocale")
     @Override
     public void runOpMode() {
 
@@ -174,6 +173,7 @@ public class apriltagTestNormalCam extends LinearOpMode {
                     telemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
                     dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f (inch)", x, y));
                 } else if(detection.id == 22){
+                    double degressOfpositionIdRed = 45;
                     double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
                     double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
                     double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
@@ -185,6 +185,7 @@ public class apriltagTestNormalCam extends LinearOpMode {
                     dashboardTelemetry.addLine(String.format("XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
                     dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
                 } else if(detection.id == 23){
+                    double degressOfpositionIdBlue = -45;
                     double x = positionIdBlue.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdBlue));
                     double y = positionIdBlue.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdBlue));
                     double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
