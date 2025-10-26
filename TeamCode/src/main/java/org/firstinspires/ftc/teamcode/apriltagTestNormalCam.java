@@ -8,12 +8,10 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.TrajectoryActionBuilder;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.robotcore.external.hardware.camera.BuiltinCameraDirection;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -23,23 +21,18 @@ import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
 import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
-import org.opencv.core.MatOfPoint2f;
-import org.opencv.core.MatOfPoint3f;
-import org.opencv.core.Point;
-import org.opencv.core.Point3;
 
 import java.util.List;
 
 @TeleOp(name = "camera apriltag")
 public class apriltagTestNormalCam extends LinearOpMode {
-    private static double fieldSize = 144; // inches
-    private static double goalHeight = 38.75; // inches
-    private static double obeliskHeight = 23; // inches
-    private static double goalAprilTagHeightOffset = 9.25; // inches
-    private static double aprilTagSize = 8.125; // inches
-    private static double goalAprilTagCenterZ = goalHeight - goalAprilTagHeightOffset;
-    private static double obeliskAprilTagCenterZ = obeliskHeight - aprilTagSize/2;
-    private static final boolean USE_WEBCAM = true;
+    private final double fieldSize = 144; // inches
+    private final double goalHeight = 38.75; // inches
+    private final double obeliskHeight = 23; // inches
+    private final double goalAprilTagHeightOffset = 9.25; // inches
+    private final double aprilTagSize = 8.125; // inches
+    private final double goalAprilTagCenterZ = goalHeight - goalAprilTagHeightOffset;
+    private final double obeliskAprilTagCenterZ = obeliskHeight - aprilTagSize/2;
     private Vector3d positionIdObelisk = new Vector3d(-fieldSize/2, 0, obeliskAprilTagCenterZ);
     private Vector3d positionIdRed = new Vector3d(-58.3727, 55.6425, goalAprilTagCenterZ);
     private Vector3d positionIdBlue = new Vector3d(-58.3727, -55.6425, goalAprilTagCenterZ);
@@ -112,15 +105,13 @@ public class apriltagTestNormalCam extends LinearOpMode {
             if (detection.metadata != null) {
                 dashboardTelemetry.addData("# AprilTags Detected", currentDetections.size());
                 dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-//                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
-//                telemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
                 dashboardTelemetry.addLine(String.format("ROBOT XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 dashboardTelemetry.addLine(String.format("FTC XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
 //                dashboardTelemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
 
                 if(detection.id == 21 || detection.id ==22 || detection.id ==23) {
                     double x = detection.robotPose.getPosition().x;
-                    double y = Math.abs(detection.robotPose.getPosition().y)-72;
+                    double y = Math.abs(detection.robotPose.getPosition().y) - (fieldSize/2);
                     positionRobot.set(new Vector3d(x, y, 0));
                     telemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
                     dashboardTelemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
