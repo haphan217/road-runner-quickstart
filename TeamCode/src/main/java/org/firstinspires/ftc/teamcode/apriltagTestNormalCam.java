@@ -98,10 +98,7 @@ public class apriltagTestNormalCam extends LinearOpMode {
     }
 
     private double tuneY(double rawY) {
-        return (0.895 * rawY) - 0.536;
-    }
-    private double tuneX(double rawX) {
-        return (0.895 * rawX) - 0.536;
+        return (1.0779 * rawY) + 1.1340;
     }
     @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
@@ -124,12 +121,11 @@ public class apriltagTestNormalCam extends LinearOpMode {
                     positionRobot.set(new Vector3d(x, y, 0));
                     telemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
                     dashboardTelemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
-//                    Pose2d beginPose = new Pose2d(y, x, Math.toRadians(180));
-//                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
-//                    road = drive.actionBuilder(beginPose)
-
-//                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(y, x)));
-//                    Actions.runBlocking(road.build());
+                    Pose2d beginPose = new Pose2d(y, x, Math.toRadians(180));
+                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+                    road = drive.actionBuilder(beginPose)
+                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(y, x)));
+                    Actions.runBlocking(road.build());
                 } else if(detection.id == 24){
                     double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
                     double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
