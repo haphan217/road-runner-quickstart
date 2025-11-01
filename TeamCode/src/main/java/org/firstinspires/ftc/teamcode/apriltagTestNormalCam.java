@@ -50,17 +50,19 @@ public class apriltagTestNormalCam extends LinearOpMode {
     public TrajectoryActionBuilder road;
 
     public DcMotor fireMotor;
-    private void fire(double rawY) {
-        double tuneY = (1.0779 * rawY) + 1.1340;
+    private void fire(double rawY, double rawX) {
+        double tuneY = (1.0895 * rawY) + 0.536;
+        double tuneX = 0.882 * (rawX) - 0.985;
+
         dashboardTelemetry.addData("REAL Y", tuneY);
-        fireMotor.setPower(tuneY*0.01);
+        dashboardTelemetry.addData("REAL X", tuneX);
+//        fireMotor.setPower(tuneY*0.01);
     }
 
     @Override
     public void runOpMode() {
 
         initAprilTag();
-        fireMotor = hardwareMap.get(DcMotor.class, "m1");
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -116,7 +118,7 @@ public class apriltagTestNormalCam extends LinearOpMode {
                 dashboardTelemetry.addData("# AprilTags Detected", currentDetections.size());
                 dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
 
-                fire(detection.ftcPose.y);
+                fire(detection.robotPose.getPosition().y, detection.robotPose.getPosition().x);
 
                 dashboardTelemetry.addLine(String.format("ROBOT XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 dashboardTelemetry.addLine(String.format("FTC XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
@@ -125,14 +127,14 @@ public class apriltagTestNormalCam extends LinearOpMode {
                 if(detection.id == 21 || detection.id ==22 || detection.id ==23) {
                     double x = detection.robotPose.getPosition().x;
                     double y = Math.abs(detection.robotPose.getPosition().y) - (fieldSize/2);
-                    positionRobot.set(new Vector3d(x, y, 0));
-                    telemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
-                    dashboardTelemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
-                    Pose2d beginPose = new Pose2d(y, x, Math.toRadians(180));
-                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
-                    road = drive.actionBuilder(beginPose)
-                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(y, x)));
-                    Actions.runBlocking(road.build());
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    Pose2d beginPose = new Pose2d(y, x, Math.toRadians(180));
+//                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+//                    road = drive.actionBuilder(beginPose)
+//                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(y, x)));
+//                    Actions.runBlocking(road.build());
                 } else if(detection.id == 24){
                     double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
                     double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
