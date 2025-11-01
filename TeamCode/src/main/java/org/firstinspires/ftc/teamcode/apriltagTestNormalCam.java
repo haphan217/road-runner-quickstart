@@ -96,6 +96,10 @@ public class apriltagTestNormalCam extends LinearOpMode {
                 .build();
         FtcDashboard.getInstance().startCameraStream(visionPortal, 0);
     }
+
+    private double tuneY(double rawY) {
+        return (1.0779 * rawY) + 1.1340;
+    }
     @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
 
@@ -105,6 +109,8 @@ public class apriltagTestNormalCam extends LinearOpMode {
             if (detection.metadata != null) {
                 dashboardTelemetry.addData("# AprilTags Detected", currentDetections.size());
                 dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
+                double realY = tuneY(detection.ftcPose.y);
+                dashboardTelemetry.addData("REAL Y", realY);
                 dashboardTelemetry.addLine(String.format("ROBOT XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 dashboardTelemetry.addLine(String.format("FTC XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
 //                dashboardTelemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
