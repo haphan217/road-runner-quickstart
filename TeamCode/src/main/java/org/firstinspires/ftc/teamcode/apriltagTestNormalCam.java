@@ -10,6 +10,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
@@ -48,10 +49,18 @@ public class apriltagTestNormalCam extends LinearOpMode {
     private Telemetry dashboardTelemetry = dashboard.getTelemetry();
     public TrajectoryActionBuilder road;
 
+    public DcMotor fireMotor;
+    private void fire(double rawY) {
+        double tuneY = (1.0779 * rawY) + 1.1340;
+        dashboardTelemetry.addData("REAL Y", tuneY);
+        fireMotor.setPower(tuneY*0.01);
+    }
+
     @Override
     public void runOpMode() {
 
         initAprilTag();
+        fireMotor = hardwareMap.get(DcMotor.class, "m1");
 
         // Wait for the DS start button to be touched.
         telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
@@ -97,9 +106,6 @@ public class apriltagTestNormalCam extends LinearOpMode {
         FtcDashboard.getInstance().startCameraStream(visionPortal, 0);
     }
 
-    private double tuneY(double rawY) {
-        return (1.0779 * rawY) + 1.1340;
-    }
     @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
 
@@ -109,8 +115,9 @@ public class apriltagTestNormalCam extends LinearOpMode {
             if (detection.metadata != null) {
                 dashboardTelemetry.addData("# AprilTags Detected", currentDetections.size());
                 dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
-                double realY = tuneY(detection.ftcPose.y);
-                dashboardTelemetry.addData("REAL Y", realY);
+
+                fire(detection.ftcPose.y);
+
                 dashboardTelemetry.addLine(String.format("ROBOT XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 dashboardTelemetry.addLine(String.format("FTC XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
 //                dashboardTelemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
