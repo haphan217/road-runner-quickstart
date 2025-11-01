@@ -98,7 +98,10 @@ public class apriltagTestNormalCam extends LinearOpMode {
     }
 
     private double tuneY(double rawY) {
-        return (1.0779 * rawY) + 1.1340;
+        return (0.895 * rawY) - 0.536;
+    }
+    private double tuneX(double rawX) {
+        return (0.895 * rawX) - 0.536;
     }
     @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
