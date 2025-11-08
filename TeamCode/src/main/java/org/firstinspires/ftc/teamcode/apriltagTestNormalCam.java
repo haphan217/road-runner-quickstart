@@ -59,23 +59,30 @@ public class apriltagTestNormalCam extends LinearOpMode {
         telemetry.update();
         waitForStart();
 
-        while (opModeIsActive()) {
-            telemetryAprilTag();
-            // Push telemetry to the Driver Station.
-            telemetry.update();
-            dashboardTelemetry.update();
+        Pose2d beginPose = new Pose2d(0, -45, Math.toRadians(180));
+        MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+        road = drive.actionBuilder(beginPose)
+                .strafeTo(new Vector2d(45, -45))
+                .strafeTo(new Vector2d(0, 0));
+        Actions.runBlocking(road.build());
 
-            // Save CPU resources; can resume streaming when needed.
-            if (gamepad1.dpad_down) {
-                visionPortal.stopStreaming();
-            } else if (gamepad1.dpad_up) {
-                visionPortal.resumeStreaming();
-            }
-
-            // Share the CPU.
-            sleep(20);
-        }
-        visionPortal.close();
+//        while (opModeIsActive()) {
+//            telemetryAprilTag();
+//            // Push telemetry to the Driver Station.
+//            telemetry.update();
+//            dashboardTelemetry.update();
+//
+//            // Save CPU resources; can resume streaming when needed.
+//            if (gamepad1.dpad_down) {
+//                visionPortal.stopStreaming();
+//            } else if (gamepad1.dpad_up) {
+//                visionPortal.resumeStreaming();
+//            }
+//
+//            // Share the CPU.
+//            sleep(20);
+//        }
+//        visionPortal.close();
 
     }
     private void initAprilTag() {
@@ -98,7 +105,10 @@ public class apriltagTestNormalCam extends LinearOpMode {
     }
 
     private double tuneY(double rawY) {
-        return (1.0779 * rawY) + 1.1340;
+        return 0.8700*rawY + 4.429;
+    }
+    private  double tuneX(double rawX) {
+        return  0.882 * rawX - 0.985;
     }
     @SuppressLint("DefaultLocale")
     private void telemetryAprilTag() {
@@ -107,48 +117,51 @@ public class apriltagTestNormalCam extends LinearOpMode {
 
         for (AprilTagDetection detection : currentDetections) {
             if (detection.metadata != null) {
+                double x = tuneX(detection.robotPose.getPosition().x);
+                double y = 72-Math.abs(tuneY(detection.robotPose.getPosition().z));
                 dashboardTelemetry.addData("# AprilTags Detected", currentDetections.size());
                 dashboardTelemetry.addLine(String.format("\n==== (ID %d) %s", detection.id, detection.metadata.name));
                 double realY = tuneY(detection.ftcPose.y);
-                dashboardTelemetry.addData("REAL Y", realY);
+//                dashboardTelemetry.addData("REAL Y", y);
+                dashboardTelemetry.addLine(String.format("REAl XY %6.1f %6.1f (inch)", x, y));
                 dashboardTelemetry.addLine(String.format("ROBOT XYZ %6.1f %6.1f %6.1f  (inch)", detection.robotPose.getPosition().x, detection.robotPose.getPosition().y, detection.robotPose.getPosition().z));
                 dashboardTelemetry.addLine(String.format("FTC XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
 //                dashboardTelemetry.addLine(String.format("PRY %6.1f %6.1f %6.1f  (deg)", detection.robotPose.getOrientation().getPitch(AngleUnit.DEGREES), detection.robotPose.getOrientation().getRoll(AngleUnit.DEGREES), detection.robotPose.getOrientation().getYaw(AngleUnit.DEGREES)));
 
-                if(detection.id == 21 || detection.id ==22 || detection.id ==23) {
-                    double x = detection.robotPose.getPosition().x;
-                    double y = Math.abs(detection.robotPose.getPosition().y) - (fieldSize/2);
-                    positionRobot.set(new Vector3d(x, y, 0));
-                    telemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
-                    dashboardTelemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
-                    Pose2d beginPose = new Pose2d(y, x, Math.toRadians(180));
-                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
-                    road = drive.actionBuilder(beginPose)
-                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(y, x)));
-                    Actions.runBlocking(road.build());
-                } else if(detection.id == 24){
-                    double x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
-                    double y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
-                    double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
-                    double degressShot = Math.asin(y/distanceShot);
-                    double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
-                    positionRobot.set(new Vector3d(x, y, 0));
-                    telemetry.addLine(String.format("RED GOAL XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
-                    telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
-                    dashboardTelemetry.addLine(String.format("RED GOAL XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
-                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
-                } else if(detection.id == 20){
-                    double x = positionIdBlue.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdBlue));
-                    double y = positionIdBlue.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdBlue));
-                    double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
-                    double degressShot = Math.asin(y/distanceShot);
-                    double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
-                    positionRobot.set(new Vector3d(x, y, 0));
-                    telemetry.addLine(String.format("BLUE GOAL XYZ Robo %6.1f %6.1f (inch)", x, y));
-                    telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
-                    dashboardTelemetry.addLine(String.format("BLUE GOAL XYZ Robo %6.1f %6.1f (inch)", x, y));
-                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
-                }
+//                if(detection.id == 21 || detection.id ==22 || detection.id ==23) {
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("OBELISK XYZ Robo %6.1f %6.1f (inch)", x, y));
+////                    Pose2d beginPose = new Pose2d(y, x, Math.toRadians(180));
+////                    MecanumDrive drive = new MecanumDrive(hardwareMap, beginPose);
+////                    road = drive.actionBuilder(beginPose)
+////                            .strafeTo(TriangleBorder.GetNearstPos(new Vector2d(y, x)));
+////                    Actions.runBlocking(road.build());
+//                    telemetry.addData("x", y);
+//                    telemetry.addData("y", x);
+//                } else if(detection.id == 24){
+//                    x = positionIdRed.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdRed));
+//                    y = positionIdRed.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdRed));
+//                    double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
+//                    double degressShot = Math.asin(y/distanceShot);
+//                    double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("RED GOAL XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
+//                    telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                    dashboardTelemetry.addLine(String.format("RED GOAL XYZ Robo %6.1f %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                } else if(detection.id == 20){
+//                    x = positionIdBlue.x + (detection.robotPose.getPosition().z*Math.sin(degressOfpositionIdBlue));
+//                    y = positionIdBlue.y + (detection.robotPose.getPosition().z*Math.cos(degressOfpositionIdBlue));
+//                    double distanceShot = Math.sqrt(Math.pow(y, 2) + Math.pow(x, 2));
+//                    double degressShot = Math.asin(y/distanceShot);
+//                    double powShot = distanceShot/90; // giả sử khi pow = 1 thì nó sẽ bắn xa được 90 inch
+//                    positionRobot.set(new Vector3d(x, y, 0));
+//                    telemetry.addLine(String.format("BLUE GOAL XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    telemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                    dashboardTelemetry.addLine(String.format("BLUE GOAL XYZ Robo %6.1f %6.1f (inch)", x, y));
+//                    dashboardTelemetry.addLine(String.format("Pow Degress Robo %6.2f %6.2f %6.2f (inch)", distanceShot, degressShot, powShot));
+//                }
             } else {
                 telemetry.addLine(("\n==== NO TAG DETECTED"));
             }
